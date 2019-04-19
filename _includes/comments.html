@@ -1,0 +1,128 @@
+<hr>
+
+<!-- Static comments -->
+<!-- Partly based on Made Mistakes' comments.html file: -->
+<!-- https://github.com/mmistakes/minimal-mistakes/blob/master/_includes/comments.html -->
+<!-- Also partly based on Eduardo Boucas' reviews.html file -->
+<!-- https://github.com/eduardoboucas/popcorn/blob/gh-pages/_includes/reviews.html -->
+
+{% if site.data.comments[page.slug] %}
+
+  <p>
+    <h3>
+    {% if site.data.comments[page.slug].size > 1 %}
+      {{ site.data.comments[page.slug] | size }}
+    {% endif %}
+    Comments:
+    </h3>
+  </p>
+
+  <hr>
+
+  {% assign comments = site.data.comments[page.slug] | sort %}
+
+  <p>
+    {% for comment in comments %}
+      <br>
+      <legend>
+        {% if comment[1].url %}
+          <a href="{{ comment[1].url }}">
+        {% endif %}
+        <strong>{{ comment[1].name }}</strong>
+        {% if comment[1].url %}
+          </a>
+        {% endif %}
+      </legend>
+      <em>{{ comment[1].date | date: "%B %d, %Y" }}</em>
+      <p>{{ comment[1].message | markdownify }}</p>
+      <hr>
+    {% endfor %}
+  </p>
+{% endif %}
+
+<!-- Comment form -->
+<p>
+    <script type="text/javascript">
+
+
+        function beforeSubmit() {
+
+            //disable button while sending
+            var submitBtn = document.getElementById("submit");
+            submitBtn.disabled = true;
+            submitBtn.value = "Sending...";
+
+            // check validity
+            var isValidForm = document.forms['commentForm'].checkValidity();
+            if (!isValidForm) {
+                submitBtn.disabled = false;
+                submitBtn.value = "Submit";
+                return false;
+            }
+
+            const date = new Date();
+            const unixTime = Math.floor(date.getTime() / 1000);
+            var msgContent = '{{page.slug}}\n'
+                       + 'name: ' + thename.value + '\n'
+                       + 'url: \'' + theurl.value + '\'\n'
+                       + 'message: \'' + message.value + '\'\n'
+                       + 'date: ' + unixTime;
+
+            // Create a client instance
+            client = new Paho.MQTT.Client("mqtt.flespi.io", Number(443),"client1234");
+ 
+            // set callback handlers
+            client.onConnectionLost = function (responseObject) {
+                console.log("Connection Lost: "+responseObject.errorMessage);
+            }
+ 
+            client.onMessageArrived = function (message) {
+              console.log("Message Arrived: "+message.payloadString);
+            }
+
+            client.onMessageDelivered = function (message) {
+              console.log("Disconnect");
+              client.disconnect();
+              window.location = "https://reverdecer.annalisagross.com/thanks.html";
+            }
+ 
+            // Called when the connection is made
+            function onConnect(){
+                console.log("Connected");
+                // Publish a Message
+                var message = new Paho.MQTT.Message(msgContent);
+                message.destinationName = "Comments/" + unixTime;
+                message.qos = 1;
+                message.retained = true;
+                client.send(message);
+            }
+ 
+            // Connect the client, providing an onConnect callback
+            client.connect({
+                onSuccess: onConnect,
+                useSSL: true,
+                userName: "wTyBIXNJm5LDWiCL6kkws7Hmpvqn93PvMcUlZvSartDdA3MubVQtQoD6HRhGKX0l",
+                password: ""
+            });
+    }
+
+    </script>
+  <h3>Post a comment:</h3>
+  <form id="commentForm">
+    <div>
+      <legend>Name</legend>
+      <input name="thename" id="thename" type="text" required>
+    </div>
+    <div>
+      <legend>Website (optional)</legend>
+      <input name="theurl" id="theurl" type="url"  value="">
+    </div>
+    <div>
+      <legend>Message (<a href="https://kramdown.gettalong.org/syntax.html">Markdown</a> allowed)</legend>
+      <textarea style="width:100%" name="message" id="message" rows="12"></textarea>
+    </div>
+    <input name="Submit" id="submit" class="c-btn" onclick="beforeSubmit();" value="Submit" /><br/>
+  </form>
+</p>
+
+
