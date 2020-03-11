@@ -1,8 +1,8 @@
 timezone: America/New_York
-title: Van Life with Pets
+title: Van Life on a Shoestring
 description: Permaculture VanDwelling
 baseurl: ''
-url: 'https://vanlifewithpets.annalisagross.com'
+url: 'https://vanlifeonashoestring.annalisagross.com'
 author-name: Anna Lisa Gross
 author-image: profile_.jpg
 author-job: Permaculture VanDwelling
@@ -53,4 +53,4 @@ defaults:
       tags: ''
       categories: ''
       layout: post
-repository: phillipzink/vanlifewithpets
+repository: phillipzink/vanlifeonashoestring
